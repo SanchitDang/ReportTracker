@@ -1,10 +1,13 @@
 package org.sanapplications.GUI;
 
+import org.sanapplications.Services.FileService;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -27,10 +30,16 @@ public class HomePage extends JFrame {
         JButton settingsButton = new JButton("Settings");
         settingsButton.setBounds(315, 40, 120, 30);
 
-        settingsButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showSettingsDialog();
-            }
+        settingsButton.addActionListener(e -> showSettingsDialog());
+
+        oldReportsButton.addActionListener(e -> {
+            ReportsHistoryPage reportsHistory = new ReportsHistoryPage(false);
+            reportsHistory.setVisible(true);
+        });
+
+        todayReportButton.addActionListener(e -> {
+            ReportsHistoryPage reportsHistory = new ReportsHistoryPage(true);
+            reportsHistory.setVisible(true);
         });
 
         JSeparator topSeparator = new JSeparator(SwingConstants.HORIZONTAL);
@@ -42,7 +51,7 @@ public class HomePage extends JFrame {
 
         timeLabel = new JLabel();
         timeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        timeLabel.setBounds(55, 140, 380, 30);
+        timeLabel.setBounds(55, 120, 380, 30);
         updateTimeLabel();
 
         reportField = new JTextArea();
@@ -53,9 +62,8 @@ public class HomePage extends JFrame {
         submitButton.setBounds(250, 400, 120, 30);
         submitButton.addActionListener(e -> {
             String report = reportField.getText();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String currentTime = sdf.format(new Date());
-            System.out.println("Report submitted at " + currentTime + ": " + report);
+            System.out.println("Report submitted: " + report);
+            FileService.writeReport(report);
             reportField.setText("");
             setVisible(false);
         });
@@ -75,13 +83,17 @@ public class HomePage extends JFrame {
     }
 
     private void updateTimeLabel() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         String currentTime = sdf.format(new Date());
-        timeLabel.setText(currentTime);
+        timeLabel.setText("Current Time: " + currentTime);
     }
 
     private void showSettingsDialog() {
         JOptionPane.showMessageDialog(this, "Settings Dialog Placeholder", "Settings", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    public static void main(String[] args) {
+        HomePage homePage = new HomePage();
+        homePage.setVisible(true);
+    }
 }
